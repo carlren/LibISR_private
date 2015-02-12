@@ -10,6 +10,10 @@ namespace LibISR
 		class ISRLowlevelEngine
 		{
 		public:
+			
+			//////////////////////////////////////////////////////////////////////////
+			//// functions that are implemented only on CPU
+			//////////////////////////////////////////////////////////////////////////
 
 			Vector4i findBoundingBoxFromCurrentState(const Objects::ISRTrackingState* state, const Matrix3f& K, const Vector2i& imgsize);
 

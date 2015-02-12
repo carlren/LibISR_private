@@ -80,3 +80,24 @@ void LibISR::Engine::ISRVisualisationEngine_CPU::renderDepthNormalAndObject(ISRU
 	}
 }
 
+void LibISR::Engine::ISRVisualisationEngine_CPU::renderContour(ISRUCharImage* mask, ISRFloat4Image* correspondingPoints, ISRFloat2Image* minmaxImg, const Matrix4f& invH, const Objects::ISRShape_ptr shape, const Vector4f& intrinsic)
+{
+	const float *voxelData = shape->getSDFVoxel();
+	uchar *outmask = mask->GetData(false);
+	Vector4f *outptcloud = correspondingPoints->GetData(false);
+	Vector2f *minmaximg = minmaxImg->GetData(false);
+	Vector2i imgSize = mask->noDims;
+
+	Vector4f invIntrinsic;
+	invIntrinsic.x = 1 / intrinsic.x; invIntrinsic.y = 1 / intrinsic.y;
+	invIntrinsic.z = -intrinsic.z*invIntrinsic.x; invIntrinsic.w = -intrinsic.w*invIntrinsic.y;
+	float one_on_top_of_maxVoxelRange = 1 / sqrtf(DT_VOL_SIZE*DT_VOL_SIZE + DT_VOL_SIZE*DT_VOL_SIZE + DT_VOL_SIZE*DT_VOL_SIZE);
+
+
+	for (int y = 0; y < imgSize.y; y++) for (int x = 0; x < imgSize.x; x++)
+	{
+		raycastAndRenderContour(outmask,outptcloud,x,y,imgSize,voxelData,invH,invIntrinsic,minmaximg,one_on_top_of_maxVoxelRange);
+	}
+}
+
+

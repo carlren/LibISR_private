@@ -7,6 +7,7 @@ using namespace LibISR::Engine;
 using namespace LibISR::Objects;
 
 __global__ void renderObject_device(Vector4u* outImg, Vector2f* minmaxImg, Vector2i imgSize,const float* voxelData, Matrix4f invH, Vector4f invIntrinsic, Vector3f lightSource, float voxelrange);
+__global__ void renderContour_device(uchar* outmask, Vector4f* outptcloud, Vector2f* minmaxImg, Vector2i imgSize, const float* voxelData, Matrix4f invH, Vector4f invIntrinsic, float voxelrange);
 
 //////////////////////////////////////////////////////////////////////////
 // host functions
@@ -36,6 +37,8 @@ void LibISR::Engine::ISRVisualisationEngine_GPU::renderObject(Objects::ISRVisual
 	rendering->outputImage->UpdateHostFromDevice();
 }
 
+
+// need to convert to GPU
 void LibISR::Engine::ISRVisualisationEngine_GPU::renderDepth(ISRUShortImage* renderedDepth, Objects::ISRVisualisationState* rendering, const Matrix4f& invH, const Objects::ISRShape_ptr shape, const Vector4f& intrinsic)
 {
 	const float *voxelData = shape->getSDFVoxel();
@@ -59,6 +62,7 @@ void LibISR::Engine::ISRVisualisationEngine_GPU::renderDepth(ISRUShortImage* ren
 	}
 }
 
+// need to convert to GPU
 void LibISR::Engine::ISRVisualisationEngine_GPU::renderDepthNormalAndObject(ISRUShortImage* renderedDepth, ISRUChar4Image* renderNormal, Objects::ISRVisualisationState* rendering, const Matrix4f& invH, const Objects::ISRShape_ptr shape, const Vector4f& intrinsic)
 {
 	const float *voxelData = shape->getSDFVoxel();
@@ -86,6 +90,30 @@ void LibISR::Engine::ISRVisualisationEngine_GPU::renderDepthNormalAndObject(ISRU
 	}
 }
 
+void LibISR::Engine::ISRVisualisationEngine_GPU::renderContour(ISRUCharImage* mask, ISRFloat4Image* correspondingPoints, ISRFloat2Image* minmaxImg, const Matrix4f& invH, const Objects::ISRShape_ptr shape, const Vector4f& intrinsic)
+{
+	const float *voxelData = shape->getSDFVoxel();
+	uchar* outmask = mask->GetData(true);
+	Vector4f* outptcloud = correspondingPoints->GetData(true);
+	Vector2f *minmaximg = minmaxImg->GetData(true);
+
+	Vector2i imgSize = mask->noDims;
+
+	dim3 blockSize(16, 16);
+	dim3 gridSize((int)ceil((float)imgSize.x / (float)blockSize.x), (int)ceil((float)imgSize.y / (float)blockSize.y));
+
+	Vector4f invIntrinsic;
+	invIntrinsic.x = 1 / intrinsic.x; invIntrinsic.y = 1 / intrinsic.y;
+	invIntrinsic.z = -intrinsic.z*invIntrinsic.x; invIntrinsic.w = -intrinsic.w*invIntrinsic.y;
+
+	float one_on_top_of_maxVoxelRange = 1 / sqrtf(DT_VOL_SIZE*DT_VOL_SIZE + DT_VOL_SIZE*DT_VOL_SIZE + DT_VOL_SIZE*DT_VOL_SIZE);
+
+
+	renderContour_device<< <gridSize, blockSize >> >(outmask, outptcloud, minmaximg, imgSize, voxelData, invH, invIntrinsic, one_on_top_of_maxVoxelRange);
+	mask->UpdateHostFromDevice();
+	correspondingPoints->UpdateHostFromDevice();
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 // device functions
@@ -97,4 +125,12 @@ __global__ void renderObject_device(Vector4u* outImg, Vector2f* minmaxImg, Vecto
 	if (x > imgSize.x - 1 || y > imgSize.y - 1) return;
 
 	raycastAndRender(outImg, x, y, imgSize, voxelData, invH, invIntrinsic, minmaxImg, lightSource, voxelrange);
+}
+
+__global__ void renderContour_device(uchar* outmask, Vector4f* outptcloud, Vector2f* minmaxImg, Vector2i imgSize, const float* voxelData, Matrix4f invH, Vector4f invIntrinsic, float voxelrange)
+{
+	int x = threadIdx.x + blockIdx.x * blockDim.x, y = threadIdx.y + blockIdx.y * blockDim.y;
+	if (x > imgSize.x - 1 || y > imgSize.y - 1) return;
+
+	raycastAndRenderContour(outmask, outptcloud, x, y, imgSize, voxelData, invH, invIntrinsic, minmaxImg, voxelrange);
 }

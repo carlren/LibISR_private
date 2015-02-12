@@ -152,3 +152,32 @@ _CPU_AND_GPU_CODE_ inline void raycastAndRenderWithDepthAndSurfaceNormal(ushort 
 
 	drawRendering(foundpoint, angle, outImgGray[idx]);
 }
+
+
+_CPU_AND_GPU_CODE_ inline void raycastAndRenderContour(uchar *outImg, Vector4f* outPtCloud, int x, int y, const Vector2i& imagesize, const float* voxelData, const Matrix4f& invH, const Vector4f& invIntrinsic, const Vector2f *minmaxdata, float maxvoxelrange)
+{
+	Vector3f pt_obj;
+
+	int idx = x + y*imagesize.x;
+
+	Vector2f minmaxvalue = minmaxdata[idx];
+	bool foundpoint = castRay(pt_obj, x, y, voxelData, invH, invIntrinsic, minmaxvalue, maxvoxelrange);
+
+	if (foundpoint)
+	{
+		outImg[idx] = 1;
+		outPtCloud[idx].x = pt_obj.x;
+		outPtCloud[idx].y = pt_obj.y;
+		outPtCloud[idx].z = pt_obj.z;
+		outPtCloud[idx].w = 1;
+	}
+	else
+	{
+		outImg[idx] = 0;
+		outPtCloud[idx].x = 0;
+		outPtCloud[idx].y = 0;
+		outPtCloud[idx].z = 0;
+		outPtCloud[idx].w = 0;
+	}
+	
+}

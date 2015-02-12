@@ -38,7 +38,6 @@ void LibISR::Engine::ISRCoreEngine::processFrame(void)
 	ISRView* myview = getView();
 	ISRImageHierarchy* myhierarchy = getImageHierarchy();
 	
-
 	myhierarchy->levels[0].boundingbox = lowLevelEngine->findBoundingBoxFromCurrentState(trackingState, myview->calib->intrinsics_d.A, myview->depth->noDims);
 	myhierarchy->levels[0].intrinsic = myview->calib->intrinsics_d.getParam();
 

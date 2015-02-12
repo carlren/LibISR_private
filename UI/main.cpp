@@ -13,7 +13,7 @@ using namespace LibISR::Engine;
 using namespace LibISR::Objects;
 using namespace LibISRUtils;
 
-int main(int argc, char** argv)
+int main_(int argc, char** argv)
 {
 	//const char *colorImgSource = "../Data/K1_cut/c-%04i.ppm";
 	//const char *depthImgSource = "../Data/K1_cut/d-%04i.pgm";

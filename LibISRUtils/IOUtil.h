@@ -43,14 +43,14 @@ static inline void PrintOneChannelToFile(char* fileName, T *data, int nCount)
 	fclose(fid);
 }
 
-
-static inline void PrintArrayToFile(char* fileName, const float *data, int nCount)
+template<typename T>
+static inline void PrintArrayToFile(char* fileName, const T *data, int nCount)
 {
 	FILE* fid = fopen(fileName, "w");
 
 	for (int i = 0; i < nCount; i++)
 	{
-		fprintf(fid, "%f\n", data[i]);
+		fprintf(fid, "%f\n", (float)data[i]);
 	}
 	fclose(fid);
 }
