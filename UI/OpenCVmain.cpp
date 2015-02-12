@@ -18,7 +18,7 @@ using namespace LibISR::Engine;
 using namespace LibISR::Objects;
 using namespace LibISRUtils;
 
-void main(int argc, char** argv)
+void main_(int argc, char** argv)
 {
 	//const char *colorImgSource = "../Data/K1_cut/c-%04i.ppm";
 	//const char *depthImgSource = "../Data/K1_cut/d-%04i.pgm";
@@ -42,7 +42,7 @@ void main(int argc, char** argv)
 
 	ISRLibSettings isrSettings;
 	isrSettings.noHistogramDim = 16;
-	isrSettings.noTrackingObj = 2;
+	isrSettings.noTrackingObj = 1;
 	isrSettings.singleAappearanceModel = true;
 	isrSettings.useGPU = true;
 
@@ -64,29 +64,6 @@ void main(int argc, char** argv)
 	
 	coreEngine->trackingState->setInvHFromParam(pose1, 0);
 	coreEngine->trackingState->setInvHFromParam(pose2, 1);
-
-
-	///////////////////////////////////////////////////////////////////////////
-	// testing stuff
-	///////////////////////////////////////////////////////////////////////////
-
-	//ISRVisualisationEngine* vengine = new ISRVisualisationEngine_CPU();
-	ISRVisualisationEngine* vengine = new ISRVisualisationEngine_GPU();
-
-	if (!imageSource->hasMoreImages()) return;
-	imageSource->getImages(coreEngine->getView());
-
-	ISRFloat4Image* raycastcloud = new ISRFloat4Image(Vector2i(640, 480), true);
-	ISRUCharImage* raycastmask = new ISRUCharImage(Vector2i(640, 480), true);
-	ISRFloat2Image* minmaximg = new ISRFloat2Image(Vector2i(640, 480), true);
-
-	vengine->updateMinmaxmImage(minmaximg, coreEngine->trackingState->getPose(0)->getH(), coreEngine->getView()->calib->intrinsics_d.A, Vector2i(640, 480));
-	minmaximg->UpdateDeviceFromHost();
-	
-	vengine->renderContour(raycastmask, raycastcloud, minmaximg, coreEngine->trackingState->getPose(0)->getInvH(), coreEngine->shapeUnion->getShape(0), coreEngine->getView()->calib->intrinsics_d.getParam());
-
-	PrintPointListToFile("e:/LibISR/debug/raycast.txt", raycastcloud->GetData(false), 640 * 480);
-	PrintArrayToFile("e:/LibISR/debug/raycastmask.txt", raycastmask->GetData(false), 640 * 480);
 
 	//////////////////////////////////////////////////////////////////////////
 	// opencv interface stuff
@@ -111,16 +88,19 @@ void main(int argc, char** argv)
 	sdkCreateTimer(&timer);
 	float processedTime = 0;
 
+
+	ISRLowlevelEngine* lowengine = new ISRLowlevelEngine_GPU();
+
 	while ((key = cvWaitKey(10)) != 27)
 	{
 
 		if (!imageSource->hasMoreImages()) return;
 		imageSource->getImages(coreEngine->getView());
-		
 
-		sdkResetTimer(&timer); sdkStartTimer(&timer);
+
+		//sdkResetTimer(&timer); sdkStartTimer(&timer);
 		coreEngine->processFrame();
-		sdkStopTimer(&timer); processedTime += sdkGetTimerValue(&timer);
+		//sdkStopTimer(&timer); processedTime += sdkGetTimerValue(&timer);
 
 		printf("\rAverage Tracking Time : [%f] ms = [%d] fps\tEnergy = %f", processedTime / count, (int)(count*1000 / processedTime),coreEngine->getEnergy());
 

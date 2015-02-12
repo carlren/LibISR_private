@@ -34,7 +34,6 @@ void LibISR::Engine::ISRCoreEngine::processFrame(void)
 	//StopWatchInterface *timer;
 	//sdkCreateTimer(&timer);
 
-
 	ISRView* myview = getView();
 	ISRImageHierarchy* myhierarchy = getImageHierarchy();
 	
@@ -46,6 +45,9 @@ void LibISR::Engine::ISRCoreEngine::processFrame(void)
 		myview->rawDepth->UpdateDeviceFromHost();
 		myview->rgb->UpdateDeviceFromHost();
 	}
+
+	myview->alignedRgb->SetFrom(myview->rgb);
+	lowLevelEngine->convertNormalizedRGB(myview->rgb, myview->rgb);
 
 	//sdkResetTimer(&timer); sdkStartTimer(&timer);
 	lowLevelEngine->prepareAlignedRGBDData(myhierarchy->levels[0].rgbd, myview->rawDepth, myview->rgb, &myview->calib->homo_depth_to_color);
@@ -74,7 +76,9 @@ void LibISR::Engine::ISRCoreEngine::processFrame(void)
 	tracker->TrackObjects(frame, shapeUnion, trackingState);
 	//sdkStopTimer(&timer); printf("Track Object Time : [%f] ms\n", sdkGetTimerValue(&timer));
 
-	myview->alignedRgb->SetFrom(myview->rgb);
+	
+	
+	// this functions will break the rgb image
 	lowLevelEngine->computepfImageFromHistogram(myview->rgb, frame->histogram);
 
 	ISRVisualisationState* myrendering = getRenderingState();

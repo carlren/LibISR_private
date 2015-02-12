@@ -28,6 +28,12 @@ namespace LibISR
 			virtual void subsampleImageRGBDImage(ISRFloat4Image *outimg, ISRFloat4Image *inimg) = 0;
 
 			virtual void preparePointCloudFromAlignedRGBDImage(ISRFloat4Image *ptcloud_out, ISRFloat4Image *inimg, Objects::ISRHistogram *histogram, const Vector4f &intrinsic  ,const Vector4i &boundingbox) = 0;
+		
+			//////////////////////////////////////////////////////////////////////////
+			//// CPU/GPU image processing functions
+			//////////////////////////////////////////////////////////////////////////
+
+			virtual void convertNormalizedRGB(ISRUChar4Image* inrgb, ISRUChar4Image* outrgb) = 0;
 		};
 	}
 

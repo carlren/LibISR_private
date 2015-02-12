@@ -13,7 +13,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 #define MAX_OBJECT_COUNT 2
-#define HISTOGRAM_BIN 16
+#define HISTOGRAM_BIN 32
 #define MAX_IMG_PTS 307200
 #define DT_VOL_SIZE 200
 #define VOL_SCALE 1000

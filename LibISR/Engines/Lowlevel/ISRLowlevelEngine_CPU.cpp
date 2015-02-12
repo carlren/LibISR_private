@@ -116,3 +116,32 @@ void LibISR::Engine::ISRLowlevelEngine_CPU::computepfImageFromHistogram(ISRUChar
 	}
 }
 
+void LibISR::Engine::ISRLowlevelEngine_CPU::convertNormalizedRGB(ISRUChar4Image* inrgb, ISRUChar4Image* outrgb)
+{
+	int w = inrgb->noDims.width;
+	int h = inrgb->noDims.height;
+
+	Vector4u *inimg_ptr = inrgb->GetData(false);
+	Vector4u *outimg_ptr = outrgb->GetData(false);
+
+	float r, g, b, nm, nr, ng, nb;
+
+	for (int i = 0; i < h; i++) for (int j = 0; j < w; j++)
+	{
+		int idx = i * w + j;
+		r = inimg_ptr[idx].r;
+		g = inimg_ptr[idx].g;
+		b = inimg_ptr[idx].b;
+		
+		if (r == 0, g == 0, b == 0) outimg_ptr[idx] = Vector4u((uchar)0);
+		else
+		{
+			nm = 1/sqrtf(r*r + g*g + b*b);
+			nr = r*nm; ng = g*nm; nb = b*nm;
+			outimg_ptr[idx].r = (uchar)(nr*255);
+			outimg_ptr[idx].g = (uchar)(ng*255);
+			outimg_ptr[idx].b = (uchar)(nb*255);
+		}
+	}
+}
+

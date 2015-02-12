@@ -13,7 +13,7 @@ using namespace LibISR::Engine;
 using namespace LibISR::Objects;
 using namespace LibISRUtils;
 
-int main_(int argc, char** argv)
+int main(int argc, char** argv)
 {
 	//const char *colorImgSource = "../Data/K1_cut/c-%04i.ppm";
 	//const char *depthImgSource = "../Data/K1_cut/d-%04i.pgm";
@@ -58,6 +58,11 @@ int main_(int argc, char** argv)
 	ISRUChar4Image *histogrammask = new ISRUChar4Image(imageSource->getDepthImageSize(), false);
 	if (!ReadImageFromFile(histogramimage, histogram_rgb)) { printf("histogram initialization error!\n"); return 0; }
 	if (!ReadImageFromFile(histogrammask, histogram_mask)) { printf("histogram initialization error!\n"); return 0; }
+
+	ISRLowlevelEngine* tmpengine = new ISRLowlevelEngine_CPU();
+	tmpengine->convertNormalizedRGB(histogramimage, histogramimage);
+	delete tmpengine;
+
 	coreEngine->frame->histogram->buildHistogram(histogramimage, histogrammask);
 
 ////	 initialized poses are [T' R']'

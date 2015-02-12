@@ -15,6 +15,8 @@ __global__ void preparePointCloudFromAlignedRGBDImage_device(Vector4f* ptcloud_o
 
 __global__ void computepfImageFromHistogram_device(Vector4u* inimg, float* histogram, Vector2i imgSize, int histBins);
 
+__global__ void convertNormalizedRGB_device(Vector4u* inimg, Vector4u* outimg, Vector2i imgSize);
+
 //////////////////////////////////////////////////////////////////////////
 // host functions
 //////////////////////////////////////////////////////////////////////////
@@ -84,6 +86,22 @@ void LibISR::Engine::ISRLowlevelEngine_GPU::computepfImageFromHistogram(ISRUChar
 
 	computepfImageFromHistogram_device << <gridSize, blockSize >> >(inimg_ptr, histogram_ptr, rgb_in->noDims, noBins);
 	rgb_in->UpdateHostFromDevice();
+}
+
+void LibISR::Engine::ISRLowlevelEngine_GPU::convertNormalizedRGB(ISRUChar4Image* inrgb, ISRUChar4Image* outrgb)
+{
+	int w = inrgb->noDims.width;
+	int h = inrgb->noDims.height;
+
+	Vector4u *inimg_ptr = inrgb->GetData(true);
+	Vector4u *outimg_ptr = outrgb->GetData(true);
+
+	dim3 blockSize(16, 16);
+	dim3 gridSize((int)ceil((float)w / (float)blockSize.x), (int)ceil((float)h / (float)blockSize.y));
+
+
+	convertNormalizedRGB_device << <gridSize, blockSize >> >(inimg_ptr, outimg_ptr,outrgb->noDims);
+	outrgb->UpdateHostFromDevice();
 }
 
 
@@ -162,5 +180,28 @@ __global__ void computepfImageFromHistogram_device(Vector4u* inimg, float* histo
 		inimg[idx].b = 255;
 	}
 
+}
+
+__global__ void convertNormalizedRGB_device(Vector4u* inimg, Vector4u* outimg, Vector2i imgSize)
+{
+	int x = threadIdx.x + blockIdx.x * blockDim.x, y = threadIdx.y + blockIdx.y * blockDim.y;
+	if (x > imgSize.x - 1 || y > imgSize.y - 1) return;
+	int idx = y * imgSize.x + x;
+
+	float r, g, b, nm, nr, ng, nb;
+
+	r = inimg[idx].r;
+	g = inimg[idx].g;
+	b = inimg[idx].b;
+
+	if (r == 0, g == 0, b == 0) outimg[idx] = Vector4u((uchar)0);
+	else
+	{
+		nm = 1 / sqrtf(r*r + g*g + b*b);
+		nr = r*nm; ng = g*nm; nb = b*nm;
+		outimg[idx].r = (uchar)(nr * 255);
+		outimg[idx].g = (uchar)(ng * 255);
+		outimg[idx].b = (uchar)(nb * 255);
+	}
 }
 
