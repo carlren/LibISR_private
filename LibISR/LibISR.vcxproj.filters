@@ -25,6 +25,15 @@
     <Filter Include="Objects\Basic">
       <UniqueIdentifier>{1a371c00-38b1-4ae1-9523-4fcecda1f011}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engines\Trackers\Depth">
+      <UniqueIdentifier>{c9ad63e6-0515-4286-bf77-d5c6ecdf5e3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engines\Trackers\RGBD">
+      <UniqueIdentifier>{31b90cc4-c96b-4fd0-a7a5-4ec5440ac4be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engines\Trackers\PWP3D">
+      <UniqueIdentifier>{d1b1bcd6-858b-4727-9b32-9416b6688d7f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engines\ISRCoreEngine.cpp">
@@ -32,15 +41,6 @@
     </ClCompile>
     <ClCompile Include="Utils\ISRCalibIO.cpp">
       <Filter>Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="Engines\Trackers\ISRDepthTracker.cpp">
-      <Filter>Engines\Trackers</Filter>
-    </ClCompile>
-    <ClCompile Include="Engines\Trackers\ISRRGBDTracker.cpp">
-      <Filter>Engines\Trackers</Filter>
-    </ClCompile>
-    <ClCompile Include="Engines\Trackers\ISRRGBDTracker_CPU.cpp">
-      <Filter>Engines\Trackers</Filter>
     </ClCompile>
     <ClCompile Include="Engines\Lowlevel\ISRLowlevelEngine.cpp">
       <Filter>Engines\Lowlevel</Filter>
@@ -54,11 +54,20 @@
     <ClCompile Include="Engines\Visualization\ISRVisualisationEngine_CPU.cpp">
       <Filter>Engines\Visualization</Filter>
     </ClCompile>
-    <ClCompile Include="Engines\Trackers\ISRPWP3DTracker.cpp">
-      <Filter>Engines\Trackers</Filter>
+    <ClCompile Include="Engines\Trackers\Depth\ISRDepthTracker.cpp">
+      <Filter>Engines\Trackers\Depth</Filter>
     </ClCompile>
-    <ClCompile Include="Engines\Trackers\ISRPWP3DTracker_CPU.cpp">
-      <Filter>Engines\Trackers</Filter>
+    <ClCompile Include="Engines\Trackers\PWP3D\ISRPWP3DTracker.cpp">
+      <Filter>Engines\Trackers\PWP3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Engines\Trackers\PWP3D\ISRPWP3DTracker_CPU.cpp">
+      <Filter>Engines\Trackers\PWP3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Engines\Trackers\RGBD\ISRRGBDTracker.cpp">
+      <Filter>Engines\Trackers\RGBD</Filter>
+    </ClCompile>
+    <ClCompile Include="Engines\Trackers\RGBD\ISRRGBDTracker_CPU.cpp">
+      <Filter>Engines\Trackers\RGBD</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -75,24 +84,6 @@
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="LibISR.h" />
-    <ClInclude Include="Engines\Trackers\ISRDepthTracker.h">
-      <Filter>Engines\Trackers</Filter>
-    </ClInclude>
-    <ClInclude Include="Engines\Trackers\ISRRGBDTracker.h">
-      <Filter>Engines\Trackers</Filter>
-    </ClInclude>
-    <ClInclude Include="Engines\Trackers\ISRTracker.h">
-      <Filter>Engines\Trackers</Filter>
-    </ClInclude>
-    <ClInclude Include="Engines\Trackers\ISRRGBDTracker_CPU.h">
-      <Filter>Engines\Trackers</Filter>
-    </ClInclude>
-    <ClInclude Include="Engines\Trackers\ISRRGBDTracker_DA.h">
-      <Filter>Engines\Trackers</Filter>
-    </ClInclude>
-    <ClInclude Include="Engines\Trackers\ISRRGBDTracker_GPU.h">
-      <Filter>Engines\Trackers</Filter>
-    </ClInclude>
     <ClInclude Include="Engines\Lowlevel\ISRLowlevelEngine.h">
       <Filter>Engines\Lowlevel</Filter>
     </ClInclude>
@@ -165,31 +156,46 @@
     <ClInclude Include="Engines\Visualization\ISRVisualisationEngine_GPU.h">
       <Filter>Engines\Visualization</Filter>
     </ClInclude>
-    <ClInclude Include="Engines\Trackers\ISRPWP3DTracker.h">
-      <Filter>Engines\Trackers</Filter>
+    <ClInclude Include="Engines\Trackers\Depth\ISRDepthTracker.h">
+      <Filter>Engines\Trackers\Depth</Filter>
     </ClInclude>
-    <ClInclude Include="Engines\Trackers\ISRPWP3DTracker_CPU.h">
-      <Filter>Engines\Trackers</Filter>
+    <ClInclude Include="Engines\Trackers\PWP3D\ISRPWP3DTracker.h">
+      <Filter>Engines\Trackers\PWP3D</Filter>
     </ClInclude>
-    <ClInclude Include="Engines\Trackers\ISRPWP3DTracker_DA.h">
-      <Filter>Engines\Trackers</Filter>
+    <ClInclude Include="Engines\Trackers\PWP3D\ISRPWP3DTracker_CPU.h">
+      <Filter>Engines\Trackers\PWP3D</Filter>
     </ClInclude>
-    <ClInclude Include="Engines\Trackers\ISRPWP3DTracker_GPU.h">
-      <Filter>Engines\Trackers</Filter>
+    <ClInclude Include="Engines\Trackers\PWP3D\ISRPWP3DTracker_DA.h">
+      <Filter>Engines\Trackers\PWP3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Engines\Trackers\PWP3D\ISRPWP3DTracker_GPU.h">
+      <Filter>Engines\Trackers\PWP3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Engines\Trackers\RGBD\ISRRGBDTracker.h">
+      <Filter>Engines\Trackers\RGBD</Filter>
+    </ClInclude>
+    <ClInclude Include="Engines\Trackers\RGBD\ISRRGBDTracker_CPU.h">
+      <Filter>Engines\Trackers\RGBD</Filter>
+    </ClInclude>
+    <ClInclude Include="Engines\Trackers\RGBD\ISRRGBDTracker_DA.h">
+      <Filter>Engines\Trackers\RGBD</Filter>
+    </ClInclude>
+    <ClInclude Include="Engines\Trackers\RGBD\ISRRGBDTracker_GPU.h">
+      <Filter>Engines\Trackers\RGBD</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="Engines\Trackers\ISRRGBDTracker_GPU.cu">
-      <Filter>Engines\Trackers</Filter>
-    </CudaCompile>
     <CudaCompile Include="Engines\Lowlevel\ISRLowlevelEngine_GPU.cu">
       <Filter>Engines\Lowlevel</Filter>
     </CudaCompile>
     <CudaCompile Include="Engines\Visualization\ISRVisualisationEngine_GPU.cu">
       <Filter>Engines\Visualization</Filter>
     </CudaCompile>
-    <CudaCompile Include="Engines\Trackers\ISRPWP3DTracker_GPU.cu">
-      <Filter>Engines\Trackers</Filter>
+    <CudaCompile Include="Engines\Trackers\PWP3D\ISRPWP3DTracker_GPU.cu">
+      <Filter>Engines\Trackers\PWP3D</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Engines\Trackers\RGBD\ISRRGBDTracker_GPU.cu">
+      <Filter>Engines\Trackers\RGBD</Filter>
     </CudaCompile>
   </ItemGroup>
 </Project>

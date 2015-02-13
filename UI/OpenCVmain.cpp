@@ -18,19 +18,19 @@ using namespace LibISR::Engine;
 using namespace LibISR::Objects;
 using namespace LibISRUtils;
 
-void main_(int argc, char** argv)
+void main(int argc, char** argv)
 {
 	//const char *colorImgSource = "../Data/K1_cut/c-%04i.ppm";
 	//const char *depthImgSource = "../Data/K1_cut/d-%04i.pgm";
 	//const char *calibFile = "../Data/Calib_kinect1.txt";
 
-	const char *colorImgSource = "E:/Data/k1_cut/c-%04i.ppm";
-	const char *depthImgSource = "E:/Data/k1_cut/d-%04i.pgm";
-	const char *calibFile = "../Data/Calib_kinect1.txt";
+	//const char *colorImgSource = "E:/Data/k1_cut/c-%04i.ppm";
+	//const char *depthImgSource = "E:/Data/k1_cut/d-%04i.pgm";
+	//const char *calibFile = "../Data/Calib_kinect1.txt";
 
-	//const char *colorImgSource = "E:/Libisr/k1_cut/cr0-%04i.ppm";
-	//const char *depthImgSource = "E:/Libisr/k1_cut/d-%04i.pgm";
-	//const char *calibFile = "../Data/calib.txt";
+	const char *colorImgSource = "E:/Libisr/k1_cut/cr0-%04i.ppm";
+	const char *depthImgSource = "E:/Libisr/k1_cut/d-%04i.pgm";
+	const char *calibFile = "../Data/calib.txt";
 
 	const char *sdfFile = "../Data/newCut.bin";
 
@@ -44,7 +44,7 @@ void main_(int argc, char** argv)
 	isrSettings.noHistogramDim = 16;
 	isrSettings.noTrackingObj = 1;
 	isrSettings.singleAappearanceModel = true;
-	isrSettings.useGPU = true;
+	isrSettings.useGPU = false;
 
 	ISRCoreEngine *coreEngine = new ISRCoreEngine(&isrSettings, &imageSource->calib, imageSource->getDepthImageSize(), imageSource->getRGBImageSize());
 
@@ -64,6 +64,29 @@ void main_(int argc, char** argv)
 	
 	coreEngine->trackingState->setInvHFromParam(pose1, 0);
 	coreEngine->trackingState->setInvHFromParam(pose2, 1);
+
+	//////////////////////////////////////////////////////////////////////////
+	// some tests
+	//////////////////////////////////////////////////////////////////////////
+
+	ISRLowlevelEngine* lengine = new ISRLowlevelEngine_CPU();
+	ISRVisualisationEngine* vengine = new ISRVisualisationEngine_CPU();
+
+	ISRUCharImage* maskimg = new ISRUCharImage(Vector2i(640, 480), false);
+	ISRFloatImage* dtimg = new ISRFloatImage(Vector2i(640, 480), false);
+	ISRFloat4Image* ptimg = new ISRFloat4Image(Vector2i(640, 480), false);
+	ISRFloat2Image* minmaximg = new ISRFloat2Image(Vector2i(640, 480), false);
+
+	dtimg->Clear(0);
+
+	Vector4i bb = lengine->findBoundingBoxFromCurrentState(coreEngine->trackingState, coreEngine->getView()->calib->intrinsics_d.A, ptimg->noDims);
+
+	vengine->updateMinmaxmImage(minmaximg, coreEngine->trackingState->getPose(0)->getH(), coreEngine->getView()->calib->intrinsics_d.A, ptimg->noDims);
+	vengine->renderContour(maskimg, ptimg, minmaximg, coreEngine->trackingState->getPose(0)->getInvH(), coreEngine->shapeUnion->getShape(0), coreEngine->getView()->calib->intrinsics_d.getParam());
+	lengine->computeSDFFromMask(dtimg, maskimg, bb);
+
+	
+
 
 	//////////////////////////////////////////////////////////////////////////
 	// opencv interface stuff

@@ -22,12 +22,13 @@ namespace LibISR
 
 			void preparePointCloudFromAlignedRGBDImage(ISRFloat4Image *ptcloud_out, ISRFloat4Image *inimg, Objects::ISRHistogram *histogram, const Vector4f &intrinsic, const Vector4i &boundingbox);
 
-
 			//////////////////////////////////////////////////////////////////////////
 			//// Image processing functions
 			//////////////////////////////////////////////////////////////////////////
 
 			void convertNormalizedRGB(ISRUChar4Image* inrgb, ISRUChar4Image* outrgb);
+
+			void computeSDFFromMask(ISRFloatImage* outsdf, ISRUCharImage* inmask, Vector4i bb);
 
 			ISRLowlevelEngine_CPU(){}
 			~ISRLowlevelEngine_CPU(){}

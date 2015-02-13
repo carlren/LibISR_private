@@ -104,6 +104,11 @@ void LibISR::Engine::ISRLowlevelEngine_GPU::convertNormalizedRGB(ISRUChar4Image*
 	outrgb->UpdateHostFromDevice();
 }
 
+void LibISR::Engine::ISRLowlevelEngine_GPU::computeSDFFromMask(ISRFloatImage* outsdf, ISRUCharImage* inmask, Vector4i bb)
+{
+
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 // device functions

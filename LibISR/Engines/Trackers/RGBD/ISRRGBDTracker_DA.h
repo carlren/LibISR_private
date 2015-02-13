@@ -1,13 +1,13 @@
 #pragma once
 
-#include "../../Utils/LibISRDefine.h"
-#include "../Lowlevel/ISRVoxelAccess_DA.h"
+#include "../../../Utils/LibISRDefine.h"
+#include "../../Lowlevel/ISRVoxelAccess_DA.h"
 
-#include "../../Objects//Highlevel/ISRTrackingState.h"
-#include "../../Objects/Highlevel/ISRShapeUnion.h"
+#include "../../../Objects//Highlevel/ISRTrackingState.h"
+#include "../../../Objects/Highlevel/ISRShapeUnion.h"
 
-#include "../../Objects/Basic/ISRPose.h"
-#include "../../Objects/Basic/ISRShape.h"
+#include "../../../Objects/Basic/ISRPose.h"
+#include "../../../Objects/Basic/ISRShape.h"
 
 // inpt now is in camera coordinates, it need to be transformed by pose invH to object coordinates
 // inpt is also been properly scaled to math the voxel resolution

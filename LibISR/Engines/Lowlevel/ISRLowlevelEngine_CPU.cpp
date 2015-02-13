@@ -145,3 +145,103 @@ void LibISR::Engine::ISRLowlevelEngine_CPU::convertNormalizedRGB(ISRUChar4Image*
 	}
 }
 
+
+#ifndef SDFsum
+#define  LONG_INFTY 100000001 
+#define SDFsum(a,b) ((((a)==LONG_INFTY) || ((b)==LONG_INFTY)) ? LONG_INFTY : (a)+(b))
+#define SDFprod(a,b) ((((a)==LONG_INFTY) || ((b)==LONG_INFTY)) ? LONG_INFTY : (a) * (b))
+#define SDFintdivint(divid, divis) (((divis) == 0 || (divid) == LONG_INFTY) ? LONG_INFTY : (float)((divid) / (divis)))
+#define SDFopp(a) (((a) == LONG_INFTY) ? LONG_INFTY : -(a))
+#endif
+
+float F(int x, int i, float gi2) { return SDFsum((x - i)*(x - i), gi2); }
+float Sep(int i, int u, float gi2, long gu2) { return SDFintdivint(SDFsum(SDFsum((float)(u*u - i*i), gu2), SDFopp(gi2)), 2 * (u - i)); }
+
+
+void dt2d_passX(float* outsdf, uchar* inmask, Vector4i bb, Vector2i imgsize, int masktype)
+{
+	for (int y = bb.y; y < bb.w; y++)
+	{
+		// set max and min
+		if (inmask[0 + y * imgsize.x] == masktype) outsdf[0 + y * imgsize.x] = 0;
+		else outsdf[0 + y * imgsize.x] = LONG_INFTY;
+
+		// Forward scan
+		for (int x = bb.x+1; x < bb.z; x++)
+			if (inmask[x + y * imgsize.x] == masktype) outsdf[x + y * imgsize.x] = 0;
+			else outsdf[x + y * imgsize.x] = SDFsum(1, outsdf[x - 1 + y * imgsize.x]);
+
+		//Backward scan
+			for (int x = bb.z - 2; x >= 0; x--)
+				if (outsdf[x + 1 + y * imgsize.x] < outsdf[x + y *  imgsize.x])
+					outsdf[x + y * imgsize.x] = SDFsum(1, outsdf[x + 1 + y * imgsize.x]);
+	}
+}
+
+
+void dt2d_passY(float *sdt_xy, float *sdt_x, Vector4i bb, Vector2i imgsize)
+{
+	int q, w;
+
+	int s[480], t[480], buff[480];
+
+	for (int x = bb.x; x < bb.z; x++)
+	{
+		q = 0; s[0] = 0; t[0] = 0;
+
+		for (int y = bb.y; y < bb.w; y++) {	buff[y] = sdt_x[x + y * imgsize.x];	}
+
+		//Forward Scan
+		for (int y = bb.y+1; y < bb.w; y++)
+		{
+			float val1 = SDFprod(buff[y], buff[y]), val2 = LONG_INFTY;
+
+			while (q >= 0)
+			{
+				val2 = SDFprod(buff[s[q]], buff[s[q]]);
+				if (F(t[q], s[q], val2) <= F(t[q], y, val1)) break;
+				q--;
+			}
+
+			if (q < 0) 
+			{ q = 0; s[0] = y; }
+			else {
+				w = 1 + Sep(s[q], y, val2, val1); 
+				if (w < bb.w) 
+				{ 
+					q++; s[q] = y; t[q] = w; 
+				} 
+			}
+		}
+
+		//Backward Scan
+		for (int y = bb.w - 1; y >= bb.y; --y)
+		{
+			sdt_xy[x + y * imgsize.x] = sqrtf(F(y, s[q], SDFprod(buff[s[q]], buff[s[q]])));
+			if (y == t[q]) q--;
+		}
+	}
+}
+
+
+void LibISR::Engine::ISRLowlevelEngine_CPU::computeSDFFromMask(ISRFloatImage* outsdf, ISRUCharImage* inmask, Vector4i bb)
+{
+	float* sdf_ptr = outsdf->GetData(false);
+	uchar*  mask_ptr = inmask->GetData(false);
+	Vector2i imgSize = inmask->noDims;
+
+	ISRFloatImage* outsdf_x = new ISRFloatImage(imgSize, false);
+	ISRFloatImage* tmpsdf = new ISRFloatImage(imgSize, false);
+
+	outsdf_x->Clear(0);
+
+	dt2d_passX(outsdf_x->GetData(false), mask_ptr, bb, imgSize,0);
+	dt2d_passY(tmpsdf->GetData(false), outsdf_x->GetData(false), bb, imgSize);
+
+	dt2d_passX(outsdf_x->GetData(false), mask_ptr, bb, imgSize,1);
+	dt2d_passY(sdf_ptr, outsdf_x->GetData(false), bb, imgSize);
+
+	for (int i = 0; i < outsdf->dataSize;i++)
+		if (mask_ptr[i] == 1) sdf_ptr[i] = -tmpsdf->GetData(false)[i];
+}
+

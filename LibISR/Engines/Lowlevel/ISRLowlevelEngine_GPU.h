@@ -28,6 +28,8 @@ namespace LibISR
 
 			void convertNormalizedRGB(ISRUChar4Image* inrgb, ISRUChar4Image* outrgb);
 
+			void computeSDFFromMask(ISRFloatImage* outsdf, ISRUCharImage* inmask, Vector4i bb);
+
 			ISRLowlevelEngine_GPU(){}
 			~ISRLowlevelEngine_GPU(){}
 		};

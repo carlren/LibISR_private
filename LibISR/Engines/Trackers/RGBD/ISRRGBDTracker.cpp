@@ -3,8 +3,8 @@
 #include <math.h>
 #include <stdio.h>
 
-#include "../../../ORUtils/Cholesky.h"
-#include "../../../LibISRUtils/IOUtil.h"
+#include "../../../../ORUtils/Cholesky.h"
+#include "../../../../LibISRUtils/IOUtil.h"
 
 using namespace LibISR::Engine;
 using namespace LibISR::Objects;

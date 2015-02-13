@@ -11,10 +11,10 @@
 #include "Lowlevel/ISRLowlevelEngine_CPU.h"
 #include "Lowlevel/ISRLowlevelEngine_GPU.h"
 
-#include "Trackers/ISRRGBDTracker.h"
-#include "Trackers/ISRRGBDTracker_DA.h"
-#include "Trackers/ISRRGBDTracker_CPU.h"
-#include "Trackers/ISRRGBDTracker_GPU.h"
+#include "Trackers/RGBD/ISRRGBDTracker.h"
+#include "Trackers/RGBD/ISRRGBDTracker_DA.h"
+#include "Trackers/RGBD/ISRRGBDTracker_CPU.h"
+#include "Trackers/RGBD/ISRRGBDTracker_GPU.h"
 
 #include "Visualization/ISRVisualisationEngine.h"
 #include "Visualization/ISRVisualisationEngine_CPU.h"

@@ -34,6 +34,9 @@ namespace LibISR
 			//////////////////////////////////////////////////////////////////////////
 
 			virtual void convertNormalizedRGB(ISRUChar4Image* inrgb, ISRUChar4Image* outrgb) = 0;
+
+			virtual void computeSDFFromMask(ISRFloatImage* outsdf, ISRUCharImage* inmask, Vector4i bb)=0;
+
 		};
 	}
 

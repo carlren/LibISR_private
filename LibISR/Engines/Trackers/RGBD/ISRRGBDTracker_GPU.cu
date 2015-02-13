@@ -1,10 +1,10 @@
 #include "ISRRGBDTracker_GPU.h"
 #include "ISRRGBDTracker_DA.h"
 
-#include "../../Utils/ISRCUDAUtils.h"
+#include "../../../Utils/ISRCUDAUtils.h"
 
-#include "../../../LibISRUtils/IOUtil.h"
-#include "../../../ORUtils/CUDADefines.h"
+#include "../../../../LibISRUtils/IOUtil.h"
+#include "../../../../ORUtils/CUDADefines.h"
 
 
 using namespace LibISR::Engine;
