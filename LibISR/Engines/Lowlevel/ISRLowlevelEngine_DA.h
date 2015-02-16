@@ -68,3 +68,44 @@ _CPU_AND_GPU_CODE_ inline void filterSubsampleWithHoles(Vector4f *imageData_out,
 
 	imageData_out[x + y * newDims.x] = pixel_out;
 }
+
+
+_CPU_AND_GPU_CODE_ inline void normalizeRGB(const Vector4u &pix_in, Vector4u& pix_out)
+{
+	float r, g, b, nm, sm, nr, ng, nb;
+
+	if (pix_in.r == 0 && pix_in.g == 0 && pix_in.b == 0) pix_out = pix_in;
+	else
+	{
+		//nm = 1 / sqrtf(r*r + g*g + b*b);
+		r = pix_in.r;
+		g = pix_in.g;
+		b = pix_in.b;
+
+		nm = 1 / (r + g + b);
+		nr = r*nm; ng = g*nm; nb = b*nm;
+		pix_out.r = (uchar)(nr * 255);
+		pix_out.g = (uchar)(ng * 255);
+		pix_out.b = (uchar)(nb * 255);
+	}
+}
+
+
+
+//_CPU_AND_GPU_CODE_ inline void normalizeRGB_brightness(const Vector4u &pix_in, Vector4f& pix_out)
+//{
+//	float r, g, b, nm, sm, nr, ng, nb;
+//
+//	if (pix_in.r == 0 && pix_in.g == 0 && pix_in.b == 0) pix_out = pix_in;
+//	else
+//	{
+//		r = logf(pix_in.r);
+//		g = logf(pix_in.g);
+//		b = logf(pix_in.b);
+//		sm = (r + g + b)*0.3333f;
+//		r -= sm; g -= sm; b -= sm;
+//		pix_out.r = (uchar)expf(r);
+//		pix_out.g = (uchar)expf(g);
+//		pix_out.b = (uchar)expf(b);
+//	}
+//}

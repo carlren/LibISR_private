@@ -193,20 +193,6 @@ __global__ void convertNormalizedRGB_device(Vector4u* inimg, Vector4u* outimg, V
 	if (x > imgSize.x - 1 || y > imgSize.y - 1) return;
 	int idx = y * imgSize.x + x;
 
-	float r, g, b, nm, nr, ng, nb;
-
-	r = inimg[idx].r;
-	g = inimg[idx].g;
-	b = inimg[idx].b;
-
-	if (r == 0, g == 0, b == 0) outimg[idx] = Vector4u((uchar)0);
-	else
-	{
-		nm = 1 / sqrtf(r*r + g*g + b*b);
-		nr = r*nm; ng = g*nm; nb = b*nm;
-		outimg[idx].r = (uchar)(nr * 255);
-		outimg[idx].g = (uchar)(ng * 255);
-		outimg[idx].b = (uchar)(nb * 255);
-	}
+	normalizeRGB(inimg[idx], outimg[idx]);
 }
 

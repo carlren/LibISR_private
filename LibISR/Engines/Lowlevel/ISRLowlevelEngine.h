@@ -18,7 +18,7 @@ namespace LibISR
 			Vector4i findBoundingBoxFromCurrentState(const Objects::ISRTrackingState* state, const Matrix3f& K, const Vector2i& imgsize);
 
 			//////////////////////////////////////////////////////////////////////////
-			//// virtual functions that are implemented both on CPU and on GPU
+			//// virtual functions that are implemented both on CPU and on GPU for RGB-D tracker and Depth Tracker
 			//////////////////////////////////////////////////////////////////////////
 
 			virtual void computepfImageFromHistogram(ISRUChar4Image *rgb_in, Objects::ISRHistogram *histogram) = 0;

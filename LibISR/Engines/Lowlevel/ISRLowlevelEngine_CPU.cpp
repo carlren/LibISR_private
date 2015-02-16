@@ -129,19 +129,7 @@ void LibISR::Engine::ISRLowlevelEngine_CPU::convertNormalizedRGB(ISRUChar4Image*
 	for (int i = 0; i < h; i++) for (int j = 0; j < w; j++)
 	{
 		int idx = i * w + j;
-		r = inimg_ptr[idx].r;
-		g = inimg_ptr[idx].g;
-		b = inimg_ptr[idx].b;
-		
-		if (r == 0, g == 0, b == 0) outimg_ptr[idx] = Vector4u((uchar)0);
-		else
-		{
-			nm = 1/sqrtf(r*r + g*g + b*b);
-			nr = r*nm; ng = g*nm; nb = b*nm;
-			outimg_ptr[idx].r = (uchar)(nr*255);
-			outimg_ptr[idx].g = (uchar)(ng*255);
-			outimg_ptr[idx].b = (uchar)(nb*255);
-		}
+		normalizeRGB(inimg_ptr[idx], outimg_ptr[idx]);
 	}
 }
 
@@ -163,16 +151,16 @@ void dt2d_passX(float* outsdf, uchar* inmask, Vector4i bb, Vector2i imgsize, int
 	for (int y = bb.y; y < bb.w; y++)
 	{
 		// set max and min
-		if (inmask[0 + y * imgsize.x] == masktype) outsdf[0 + y * imgsize.x] = 0;
-		else outsdf[0 + y * imgsize.x] = LONG_INFTY;
+		if (inmask[bb.x + y * imgsize.x] == masktype) outsdf[bb.x + y * imgsize.x] = 0;
+		else outsdf[bb.x + y * imgsize.x] = LONG_INFTY;
 
 		// Forward scan
-		for (int x = bb.x+1; x < bb.z; x++)
+		for (int x = bb.x + 1; x < bb.z; x++)
 			if (inmask[x + y * imgsize.x] == masktype) outsdf[x + y * imgsize.x] = 0;
 			else outsdf[x + y * imgsize.x] = SDFsum(1, outsdf[x - 1 + y * imgsize.x]);
 
 		//Backward scan
-			for (int x = bb.z - 2; x >= 0; x--)
+			for (int x = bb.z - 2; x >= bb.x; x--)
 				if (outsdf[x + 1 + y * imgsize.x] < outsdf[x + y *  imgsize.x])
 					outsdf[x + y * imgsize.x] = SDFsum(1, outsdf[x + 1 + y * imgsize.x]);
 	}
@@ -230,16 +218,26 @@ void LibISR::Engine::ISRLowlevelEngine_CPU::computeSDFFromMask(ISRFloatImage* ou
 	uchar*  mask_ptr = inmask->GetData(false);
 	Vector2i imgSize = inmask->noDims;
 
+
 	ISRFloatImage* outsdf_x = new ISRFloatImage(imgSize, false);
 	ISRFloatImage* tmpsdf = new ISRFloatImage(imgSize, false);
 
-	outsdf_x->Clear(0);
 
+	outsdf_x->Clear(0);
 	dt2d_passX(outsdf_x->GetData(false), mask_ptr, bb, imgSize,0);
 	dt2d_passY(tmpsdf->GetData(false), outsdf_x->GetData(false), bb, imgSize);
 
+	
+	outsdf_x->Clear(0);
+	
+	
 	dt2d_passX(outsdf_x->GetData(false), mask_ptr, bb, imgSize,1);
+	//PrintArrayToFile("e:/libisr/debug/dt_x.txt", outsdf_x->GetData(false), inmask->dataSize);
+	
+
 	dt2d_passY(sdf_ptr, outsdf_x->GetData(false), bb, imgSize);
+
+	
 
 	for (int i = 0; i < outsdf->dataSize;i++)
 		if (mask_ptr[i] == 1) sdf_ptr[i] = -tmpsdf->GetData(false)[i];

@@ -39,6 +39,8 @@ namespace LibISR
 				data_notnormalised = new Vector2f[dim];
 				posterior = new float[dim];
 
+				for (int i = 0; i < dim; i++) posterior[i] = 0.5f;
+
 				if (usegpu) ORcudaSafeCall(cudaMalloc((void**)&posterior_device, dim*sizeof(float)));
 
 				this->clear();

@@ -42,7 +42,7 @@ void main(int argc, char** argv)
 
 	ISRLibSettings isrSettings;
 	isrSettings.noHistogramDim = 16;
-	isrSettings.noTrackingObj = 1;
+	isrSettings.noTrackingObj = 2;
 	isrSettings.singleAappearanceModel = true;
 	isrSettings.useGPU = false;
 
@@ -83,92 +83,96 @@ void main(int argc, char** argv)
 
 	vengine->updateMinmaxmImage(minmaximg, coreEngine->trackingState->getPose(0)->getH(), coreEngine->getView()->calib->intrinsics_d.A, ptimg->noDims);
 	vengine->renderContour(maskimg, ptimg, minmaximg, coreEngine->trackingState->getPose(0)->getInvH(), coreEngine->shapeUnion->getShape(0), coreEngine->getView()->calib->intrinsics_d.getParam());
-	lengine->computeSDFFromMask(dtimg, maskimg, bb);
-
 	
+	StopWatchInterface *timer;
+	sdkCreateTimer(&timer); sdkResetTimer(&timer); sdkStartTimer(&timer);
+	lengine->computeSDFFromMask(dtimg, maskimg, bb);
+	sdkStopTimer(&timer); printf("SDF time:%f\n", sdkGetTimerValue(&timer));
+	
+	DEBUGBREAK
 
 
 	//////////////////////////////////////////////////////////////////////////
 	// opencv interface stuff
 	//////////////////////////////////////////////////////////////////////////
 
-	cvNamedWindow("Depth", 0);
-	IplImage* depthFrame = cvCreateImage(cvSize(640, 480), 8, 4);
-
-	Vector3f cpt[4];	cpt[0] = Vector3f(0, 0, 0);	cpt[1] = Vector3f(0.1, 0, 0);	cpt[2] = Vector3f(0, 0.1, 0);	cpt[3] = Vector3f(0, 0, 0.1);
-	CvPoint cvpt[4];Vector3f ipt[4];
-	CvScalar color[3];	color[0] = CV_RGB(0, 0, 255);	color[1] = CV_RGB(0, 255, 0);	color[2] = CV_RGB(255, 0, 0);
-	CvScalar bbcolor = CV_RGB(255,255,0);
-
-	int key;
-	int count = 0;
-
-	Matrix3f A = coreEngine->getView()->calib->intrinsics_d.A;
-	Matrix3f H = coreEngine->getView()->calib->homo_depth_to_color.H;
-	Vector3f T = coreEngine->getView()->calib->homo_depth_to_color.T*0.001;
-
-	StopWatchInterface *timer;
-	sdkCreateTimer(&timer);
-	float processedTime = 0;
-
-
-	ISRLowlevelEngine* lowengine = new ISRLowlevelEngine_GPU();
-
-	while ((key = cvWaitKey(10)) != 27)
-	{
-
-		if (!imageSource->hasMoreImages()) return;
-		imageSource->getImages(coreEngine->getView());
-
-
-		//sdkResetTimer(&timer); sdkStartTimer(&timer);
-		coreEngine->processFrame();
-		//sdkStopTimer(&timer); processedTime += sdkGetTimerValue(&timer);
-
-		printf("\rAverage Tracking Time : [%f] ms = [%d] fps\tEnergy = %f", processedTime / count, (int)(count*1000 / processedTime),coreEngine->getEnergy());
-
-		Vector4i bb = coreEngine->frame->imgHierarchy->levels[0].boundingbox;
-		memcpy(depthFrame->imageData, (char*)coreEngine->getView()->alignedRgb->GetData(false), 640 * 480 * sizeof(char) * 4);
-		//memcpy(depthFrame->imageData, (char*)coreEngine->getRenderingState()->outputImage->GetData(false), 640 * 480 * sizeof(char) * 4); H.setIdentity(); T = Vector3f(0, 0, 0);
-
-		//// draw the axis on object
-		//Matrix4f M = coreEngine->trackingState->getPose(0)->getH();
-		//for (int i = 0; i < 4; i++)
-		//{
-		//	ipt[i] = H*(A*(M*cpt[i])) + T;
-		//	cvpt[i].x = ipt[i].x / ipt[i].z;
-		//	cvpt[i].y = ipt[i].y / ipt[i].z;
-		//}
-		//for (int i = 0; i < 3; i++) cvDrawLine(depthFrame, cvpt[0], cvpt[i + 1], color[i], 2);
-		//
-		//M = coreEngine->trackingState->getPose(1)->getH();
-		//for (int i = 0; i < 4; i++)
-		//{
-		//	ipt[i] = H*(A*(M*cpt[i])) + T;
-		//	cvpt[i].x = ipt[i].x / ipt[i].z;
-		//	cvpt[i].y = ipt[i].y / ipt[i].z;
-		//}
-		//for (int i = 0; i < 3; i++) cvDrawLine(depthFrame, cvpt[0], cvpt[i + 1], color[i], 2);
-		
-		//// draw the bounding box
-		//CvPoint p1, p2, p3, p4;
-		//p1.x = bb.x; p1.y = bb.y; 
-		//p2.x = bb.z; p2.y = bb.y;
-		//p3.x = bb.z; p4.y = bb.w;
-		//p4.x = bb.x, p3.y = bb.w;
-		//
-		//cvDrawLine(depthFrame, p1, p2, bbcolor, 2);
-		//cvDrawLine(depthFrame, p2, p3, bbcolor, 2);
-		//cvDrawLine(depthFrame, p3, p4, bbcolor, 2);
-		//cvDrawLine(depthFrame, p4, p1, bbcolor, 2);
-
-		cvShowImage("Depth", depthFrame);
-
-		//char tmpchar[200];
-		//sprintf(tmpchar, outName, count);
-		//cvSaveImage(tmpchar, depthFrame);
-
-		count++;
-	}
-	cvDestroyAllWindows();
+//	cvNamedWindow("Depth", 0);
+//	IplImage* depthFrame = cvCreateImage(cvSize(640, 480), 8, 4);
+//
+//	Vector3f cpt[4];	cpt[0] = Vector3f(0, 0, 0);	cpt[1] = Vector3f(0.1, 0, 0);	cpt[2] = Vector3f(0, 0.1, 0);	cpt[3] = Vector3f(0, 0, 0.1);
+//	CvPoint cvpt[4];Vector3f ipt[4];
+//	CvScalar color[3];	color[0] = CV_RGB(0, 0, 255);	color[1] = CV_RGB(0, 255, 0);	color[2] = CV_RGB(255, 0, 0);
+//	CvScalar bbcolor = CV_RGB(255,255,0);
+//
+//	int key;
+//	int count = 0;
+//
+//	Matrix3f A = coreEngine->getView()->calib->intrinsics_d.A;
+//	Matrix3f H = coreEngine->getView()->calib->homo_depth_to_color.H;
+//	Vector3f T = coreEngine->getView()->calib->homo_depth_to_color.T*0.001;
+//
+//	StopWatchInterface *timer;
+//	sdkCreateTimer(&timer);
+//	float processedTime = 0;
+//
+//
+//	ISRLowlevelEngine* lowengine = new ISRLowlevelEngine_GPU();
+//
+//	while ((key = cvWaitKey(10)) != 27)
+//	{
+//
+//		if (!imageSource->hasMoreImages()) return;
+//		imageSource->getImages(coreEngine->getView());
+//
+//
+//		//sdkResetTimer(&timer); sdkStartTimer(&timer);
+//		coreEngine->processFrame();
+//		//sdkStopTimer(&timer); processedTime += sdkGetTimerValue(&timer);
+//
+//		printf("\rAverage Tracking Time : [%f] ms = [%d] fps\tEnergy = %f", processedTime / count, (int)(count*1000 / processedTime),coreEngine->getEnergy());
+//
+//		Vector4i bb = coreEngine->frame->imgHierarchy->levels[0].boundingbox;
+//		memcpy(depthFrame->imageData, (char*)coreEngine->getView()->alignedRgb->GetData(false), 640 * 480 * sizeof(char) * 4);
+//		//memcpy(depthFrame->imageData, (char*)coreEngine->getRenderingState()->outputImage->GetData(false), 640 * 480 * sizeof(char) * 4); H.setIdentity(); T = Vector3f(0, 0, 0);
+//
+//		//// draw the axis on object
+//		//Matrix4f M = coreEngine->trackingState->getPose(0)->getH();
+//		//for (int i = 0; i < 4; i++)
+//		//{
+//		//	ipt[i] = H*(A*(M*cpt[i])) + T;
+//		//	cvpt[i].x = ipt[i].x / ipt[i].z;
+//		//	cvpt[i].y = ipt[i].y / ipt[i].z;
+//		//}
+//		//for (int i = 0; i < 3; i++) cvDrawLine(depthFrame, cvpt[0], cvpt[i + 1], color[i], 2);
+//		//
+//		//M = coreEngine->trackingState->getPose(1)->getH();
+//		//for (int i = 0; i < 4; i++)
+//		//{
+//		//	ipt[i] = H*(A*(M*cpt[i])) + T;
+//		//	cvpt[i].x = ipt[i].x / ipt[i].z;
+//		//	cvpt[i].y = ipt[i].y / ipt[i].z;
+//		//}
+//		//for (int i = 0; i < 3; i++) cvDrawLine(depthFrame, cvpt[0], cvpt[i + 1], color[i], 2);
+//		
+//		//// draw the bounding box
+//		//CvPoint p1, p2, p3, p4;
+//		//p1.x = bb.x; p1.y = bb.y; 
+//		//p2.x = bb.z; p2.y = bb.y;
+//		//p3.x = bb.z; p4.y = bb.w;
+//		//p4.x = bb.x, p3.y = bb.w;
+//		//
+//		//cvDrawLine(depthFrame, p1, p2, bbcolor, 2);
+//		//cvDrawLine(depthFrame, p2, p3, bbcolor, 2);
+//		//cvDrawLine(depthFrame, p3, p4, bbcolor, 2);
+//		//cvDrawLine(depthFrame, p4, p1, bbcolor, 2);
+//
+//		cvShowImage("Depth", depthFrame);
+//
+//		//char tmpchar[200];
+//		//sprintf(tmpchar, outName, count);
+//		//cvSaveImage(tmpchar, depthFrame);
+//
+//		count++;
+//	}
+//	cvDestroyAllWindows();
 }

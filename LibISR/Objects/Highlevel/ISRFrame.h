@@ -30,7 +30,8 @@ namespace LibISR
 
 			ISRHistogram *histogram;
 			ISRFloat4Image *ptCloud;
-			
+			ISRFloatImage *sdf2D;
+
 			ISRImageHierarchy *imgHierarchy;
 			ISRImageHierarchy::ImageLevel *currentLevel;
 
@@ -42,6 +43,7 @@ namespace LibISR
 				rgb_size = color_size;
 
 				ptCloud = new ISRFloat4Image(d_size, useGPU);
+				sdf2D = new ISRFloatImage(d_size, useGPU);
 
 				view = new ISRView(calib, color_size, d_size, useGPU);
 				imgHierarchy = new ISRImageHierarchy(d_size, noHierarchy, useGPU);
@@ -52,6 +54,7 @@ namespace LibISR
 			{
 			
 				delete ptCloud;
+				delete sdf2D;
 				delete view;
 				delete imgHierarchy;
 				delete rendering;
