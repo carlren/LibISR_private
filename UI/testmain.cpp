@@ -32,7 +32,7 @@ void main(int argc, char** argv)
 	//////////////////////////////////////////////////////////////////////////
 	// test stuff
 	//////////////////////////////////////////////////////////////////////////
-	bool usegpu = false;
+	bool usegpu = true;
 
 	ISRShape_ptr initdt = new ISRShape(); initdt->initialize(usegpu, 0); initdt->loadShapeFromFile(sdfFile);
 	ISRShape_ptr tmpshape = new ISRShape(); tmpshape->initialize(usegpu, 0); tmpshape->loadShapeFromFile(sdfFile);
