@@ -20,10 +20,10 @@ namespace LibISR
 			void lableForegroundPixels(Objects::ISRTrackingState * trackerState);
 
 			void lableForegroundPixels(Objects::ISRTrackingState * trackerState, Vector4i bb);
+
 		public:
 			ISRRGBDTracker_CPU(int nObjs);
 			~ISRRGBDTracker_CPU();
-
 
 		};
 

@@ -7,6 +7,8 @@ using namespace LibISR::Engine;
 using namespace LibISR::Objects;
 
 __global__ void renderObject_device(Vector4u* outImg, Vector2f* minmaxImg, Vector2i imgSize,const float* voxelData, Matrix4f invH, Vector4f invIntrinsic, Vector3f lightSource, float voxelrange);
+__global__ void renderDepthNormalAndObject_device(ushort* outdepth, Vector4u* outImgGray, Vector4u* outnormal, Vector2f* minmaxImg, Vector2i imgSize, const float* voxelData, Matrix4f invH, Vector4f invIntrinsic, Vector3f lightSource, float voxelrange);
+
 
 //////////////////////////////////////////////////////////////////////////
 // host functions
@@ -62,15 +64,17 @@ void LibISR::Engine::ISRVisualisationEngine_GPU::renderDepth(ISRUShortImage* ren
 void LibISR::Engine::ISRVisualisationEngine_GPU::renderDepthNormalAndObject(ISRUShortImage* renderedDepth, ISRUChar4Image* renderNormal, Objects::ISRVisualisationState* rendering, const Matrix4f& invH, const Objects::ISRShape_ptr shape, const Vector4f& intrinsic)
 {
 	const float *voxelData = shape->getSDFVoxel();
-	ushort *outimageD = renderedDepth->GetData(false);
-	Vector4u* outimageGray = rendering->outputImage->GetData(false);
-	Vector4u* outimageNormal = renderNormal->GetData(false);
+	ushort *outimageD = renderedDepth->GetData(true);
+	Vector4u* outimageGray = rendering->outputImage->GetData(true);
+	Vector4u* outimageNormal = renderNormal->GetData(true);
 
-
-	Vector2f *minmaximg = rendering->minmaxImage->GetData(false);
+	Vector2f *minmaximg = rendering->minmaxImage->GetData(true);
 
 	Vector2i imgSize = rendering->outputImage->noDims;
 	Vector3f lightSource = -Vector3f(invH.getColumn(2));
+
+	dim3 blockSize(16, 16);
+	dim3 gridSize((int)ceil((float)imgSize.x / (float)blockSize.x), (int)ceil((float)imgSize.y / (float)blockSize.y));
 
 	Vector4f invIntrinsic;
 	invIntrinsic.x = 1 / intrinsic.x; invIntrinsic.y = 1 / intrinsic.y;
@@ -78,11 +82,11 @@ void LibISR::Engine::ISRVisualisationEngine_GPU::renderDepthNormalAndObject(ISRU
 
 	float one_on_top_of_maxVoxelRange = 1 / sqrtf(DT_VOL_SIZE*DT_VOL_SIZE + DT_VOL_SIZE*DT_VOL_SIZE + DT_VOL_SIZE*DT_VOL_SIZE);
 
+	renderDepthNormalAndObject_device << <gridSize, blockSize >> >(outimageD, outimageGray, outimageNormal, minmaximg, imgSize, voxelData, invH, invIntrinsic,lightSource, one_on_top_of_maxVoxelRange);
 
-	for (int y = 0; y < imgSize.y; y++) for (int x = 0; x < imgSize.x; x++)
-	{
-		raycastAndRenderWithDepthAndSurfaceNormal(outimageD,outimageGray,outimageNormal, x, y, imgSize, voxelData, invH, invIntrinsic, minmaximg,lightSource, one_on_top_of_maxVoxelRange);
-	}
+	renderedDepth->UpdateHostFromDevice();
+	renderNormal->UpdateHostFromDevice();
+	rendering->outputImage->UpdateHostFromDevice();
 }
 
 
@@ -97,3 +101,13 @@ __global__ void renderObject_device(Vector4u* outImg, Vector2f* minmaxImg, Vecto
 
 	raycastAndRender(outImg, x, y, imgSize, voxelData, invH, invIntrinsic, minmaxImg, lightSource, voxelrange);
 }
+
+__global__ void renderDepthNormalAndObject_device(ushort* outdepth, Vector4u* outImgGray, Vector4u* outnormal, Vector2f* minmaxImg, Vector2i imgSize, const float* voxelData, Matrix4f invH, Vector4f invIntrinsic, Vector3f lightSource, float voxelrange)
+{
+	int x = threadIdx.x + blockIdx.x * blockDim.x, y = threadIdx.y + blockIdx.y * blockDim.y;
+	if (x > imgSize.x - 1 || y > imgSize.y - 1) return;
+
+	raycastAndRenderWithDepthAndSurfaceNormal(outdepth, outImgGray, outnormal, x, y, imgSize, voxelData, invH, invIntrinsic, minmaxImg, lightSource, voxelrange);
+
+}
+

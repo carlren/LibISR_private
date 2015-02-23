@@ -180,6 +180,9 @@
     <ClInclude Include="Engines\Reconstruction\ISRReconstructionEngine_GPU.h">
       <Filter>Engines\Reconstruction</Filter>
     </ClInclude>
+    <ClInclude Include="Objects\Basic\ISRVol.h">
+      <Filter>Objects\Basic</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="Engines\Trackers\ISRRGBDTracker_GPU.cu">

@@ -14,7 +14,6 @@ void LibISR::Engine::ISRVisualisationEngine_CPU::renderObject(Objects::ISRVisual
 	Vector2f *minmaximg = rendering->minmaxImage->GetData(false);
 
 	Vector2i imgSize = rendering->outputImage->noDims;
-	float mu = 0.5;
 	Vector3f lightSource = -Vector3f(invH.getColumn(2));
 
 	Vector4f invIntrinsic; 
@@ -70,7 +69,6 @@ void LibISR::Engine::ISRVisualisationEngine_CPU::renderDepthNormalAndObject(ISRU
 	Vector2f *minmaximg = rendering->minmaxImage->GetData(false);
 
 	Vector2i imgSize = rendering->outputImage->noDims;
-	float mu = 0.5;
 	Vector3f lightSource = -Vector3f(invH.getColumn(2));
 
 	Vector4f invIntrinsic;
@@ -81,8 +79,9 @@ void LibISR::Engine::ISRVisualisationEngine_CPU::renderDepthNormalAndObject(ISRU
 
 #pragma omp parallel 
 	{
-#pragma omp for
-		for (int y = 0; y < imgSize.y; y++) for (int x = 0; x < imgSize.x; x++)
+		int x;
+#pragma omp for private(x)
+		for (int y = 0; y < imgSize.y; y++) for (x = 0; x < imgSize.x; x++)
 		{
 			raycastAndRenderWithDepthAndSurfaceNormal(outimageD, outimageGray, outimageNormal, x, y, imgSize, voxelData, invH, invIntrinsic, minmaximg, lightSource, one_on_top_of_maxVoxelRange);
 		}

@@ -63,11 +63,10 @@ _CPU_AND_GPU_CODE_ inline void computeNormalAndAngle(Vector3f & normal_out, floa
 	normal_out = getSDFNormal(pt_in, voxelData, foundPoint);
 	if (!foundPoint) return;
 
-	float normScale = 1.0f / sqrtf(normal_out.x * normal_out.x + normal_out.y * normal_out.y + normal_out.z * normal_out.z);
-	normal_out *= normScale;
+	normal_out = normal_out.normalised();
 
 	angle_out = normal_out.x * lightSource.x + normal_out.y * lightSource.y + normal_out.z * lightSource.z;
-	if (!(angle_out > 0.0)) angle_out=0;
+	if (!(angle_out > 0.0f)) angle_out = 0.0f;
 }
 
 _CPU_AND_GPU_CODE_ inline void drawRendering(const bool & foundPoint, const float & angle, Vector4u & dest)
@@ -138,15 +137,15 @@ _CPU_AND_GPU_CODE_ inline void raycastAndRenderWithDepthAndSurfaceNormal(ushort 
 		pt_cam = H*pt_obj;
 		outImgD[idx] = (ushort)(65535 * pt_cam.z);
 	}
-	else outImgD[idx] = 0;
+	else outImgD[idx] = 0.0f;
 
 	computeNormalAndAngle(normal_obj, angle, foundpoint, pt_obj, voxelData, lightsource);
 		
 	if (foundpoint)
 	{
-		outImgNormal[idx].r = (uchar)((0.4 + normal_obj.r*0.6)*255.0f);
-		outImgNormal[idx].g = (uchar)((0.4 + normal_obj.g*0.6)*255.0f);
-		outImgNormal[idx].b = (uchar)((0.4 + normal_obj.b*0.6)*255.0f);
+		outImgNormal[idx].r = (uchar)((0.1f + (normal_obj.x + 1.0f)*0.45f)*255.0f);
+		outImgNormal[idx].g = (uchar)((0.1f + (normal_obj.y + 1.0f)*0.45f)*255.0f);
+		outImgNormal[idx].b = (uchar)((0.1f + (normal_obj.z + 1.0f)*0.45f)*255.0f);
 	}
 	else outImgNormal[idx] = Vector4u((uchar)0);
 

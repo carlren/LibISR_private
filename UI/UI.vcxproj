@@ -154,6 +154,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="ImageSourceEngine.h" />
+    <ClInclude Include="opencvhelper.h" />
     <ClInclude Include="OpenNIEngine.h" />
     <ClInclude Include="UIEngine.h" />
   </ItemGroup>
@@ -162,6 +163,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="OpenCVmain.cpp" />
     <ClCompile Include="OpenNIEngine.cpp" />
+    <ClCompile Include="testmain.cpp" />
     <ClCompile Include="UIEngine.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

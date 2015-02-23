@@ -13,7 +13,7 @@ using namespace LibISR::Engine;
 using namespace LibISR::Objects;
 using namespace LibISRUtils;
 
-int main_(int argc, char** argv)
+int main__(int argc, char** argv)
 {
 
 	//////////////////////////////////////////////////////////////////////////
@@ -21,7 +21,9 @@ int main_(int argc, char** argv)
 	//////////////////////////////////////////////////////////////////////////
 
 	//const char *sdfFile = "../Data/newCut.bin";
-	const char *sdfFile = "../Data/teacan.bin";
+	//const char *sdfFile = "../Data/newnewcut.bin";
+	const char *sdfFile = "../Data/newnewcut_noint.bin";
+	//const char *sdfFile = "../Data/teacan.bin";
 	//const char *sdfFile = "../Data/ball.bin";
 
 	const char *calibFile = "../Data/calib_reg.txt";
@@ -31,7 +33,7 @@ int main_(int argc, char** argv)
 	isrSettings.noHistogramDim = HISTOGRAM_BIN;
 	isrSettings.noTrackingObj = 1;
 	isrSettings.singleAappearanceModel = true;
-	isrSettings.useGPU = true;
+	isrSettings.useGPU = false;
 
 	ISRCoreEngine *coreEngine = new ISRCoreEngine(&isrSettings, &imageSource->calib, imageSource->getDepthImageSize(), imageSource->getRGBImageSize());
 	coreEngine->shapeUnion->loadShapeFromFile(sdfFile, Vector3i(DT_VOL_SIZE, DT_VOL_SIZE, DT_VOL_SIZE), 0);

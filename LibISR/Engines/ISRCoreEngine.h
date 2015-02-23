@@ -21,6 +21,11 @@
 #include "Visualization/ISRVisualisationEngine_DA.h"
 #include "Visualization/ISRVisualisationEngine_GPU.h"
 
+#include "Reconstruction/ISRReconstructionEngine.h"
+#include "Reconstruction/ISRReconstructionEngine_CPU.h"
+#include "Reconstruction/ISRReconstructionEngine_GPU.h"
+#include "Reconstruction/ISRReconstructionEngine_DA.h"
+
 namespace LibISR
 {
 	namespace Engine

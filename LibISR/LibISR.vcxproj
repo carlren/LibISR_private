@@ -64,6 +64,7 @@
     <ClInclude Include="Objects\Basic\ISRShape.h" />
     <ClInclude Include="Objects\Basic\ISRView.h" />
     <ClInclude Include="Objects\Basic\ISRVisualisationState.h" />
+    <ClInclude Include="Objects\Basic\ISRVol.h" />
     <ClInclude Include="Objects\Highlevel\ISRFrame.h" />
     <ClInclude Include="Objects\Highlevel\ISRShapeUnion.h" />
     <ClInclude Include="Objects\Highlevel\ISRTrackingState.h" />
