@@ -139,3 +139,16 @@ _CPU_AND_GPU_CODE_ inline float getSDFValue(const Vector3i &pt_i, const float* v
 	else{ ddtFound = true; return voxelBlock[idx]; }
 }
 
+_CPU_AND_GPU_CODE_ inline bool setSDFValue(const Vector3i &pt_i, float* voxelBlock, float val)
+{
+	int idx = pt2IntIdx(pt_i);
+	if (idx == -1)	return false;
+	else { voxelBlock[idx] = val; return true; }
+}
+
+_CPU_AND_GPU_CODE_ inline bool setSDFValue(const Vector3f &pt_f, float* voxelBlock, float val)
+{
+	int idx = pt2IntIdx(pt_f);
+	if (idx == -1)	return false;
+	else { voxelBlock[idx] = val; return true; }
+}

@@ -2,6 +2,31 @@
 
 #include "../Lowlevel/ISRVoxelAccess_DA.h"
 
+#ifndef LONG_INFTY
+#define LONG_INFTY 100000000
+#endif
+
+#ifndef sum_isr
+#define sum_isr(a,b) ((((a)==LONG_INFTY) || ((b)==LONG_INFTY)) ? LONG_INFTY : (a)+(b))
+#endif
+
+#ifndef prod_isr
+#define prod_isr(a,b) ((((a)==LONG_INFTY) || ((b)==LONG_INFTY)) ? LONG_INFTY : (a) * (b))
+#endif
+//
+#ifndef opp_isr
+#define opp_isr(a) (((a) == LONG_INFTY) ? LONG_INFTY : -(a))
+#endif
+
+#ifndef intdivint_isr
+#define intdivint_isr(divid, divis) (((divis) == 0 || (divid) == LONG_INFTY) ? LONG_INFTY : (long)((divid) / (divis)))
+#endif
+
+_CPU_AND_GPU_CODE_ inline float F(int x, int i, float gi2) { return sum_isr((x - i)*(x - i), gi2); }
+_CPU_AND_GPU_CODE_ inline float Sep(int i, int u, float gi2, float gu2) { return intdivint_isr(sum_isr(sum_isr((float)(u*u - i*i), gu2), opp_isr(gi2)), 2 * (u - i)); }
+
+
+
 _CPU_AND_GPU_CODE_ inline void evolveVoxelOneStep(float* outsdfptr, float* sdfptr, float* pinptr, int i, int j, int k)
 {
 

@@ -89,7 +89,7 @@ _CPU_AND_GPU_CODE_ inline bool computePerPixelJacobian(float *jacobian, const Ve
 	float dbase = exp_dt / (deto * deto);
 
 	float d_heaviside_dt = dbase * DTUNE;
-	float d_delta_dt = 8.0f *DTUNE* expf(-2 * DTUNE*dt) / (deto * deto* deto) - 4 * DTUNE * dbase;
+	float d_delta_dt = 8.0f *DTUNE* expf(-2.0f * DTUNE*dt) / (deto * deto* deto) - 4.0f * DTUNE * dbase;
 
 	float prefix = inpt.w*d_delta_dt*TMP_WEIGHT + (1 - inpt.w)*d_heaviside_dt*(2-TMP_WEIGHT);
 

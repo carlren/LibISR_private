@@ -31,6 +31,16 @@ void LibISR::Engine::ISRReconstructionEngine_GPU::evolve3DShape(Objects::ISRShap
 	}
 }
 
+void LibISR::Engine::ISRReconstructionEngine_GPU::reinitializeSDF(Objects::ISRShape_ptr inshape, Objects::ISRShape_ptr tmpshape, Objects::ISRShape_ptr tmpshape2)
+{
+
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+// device functions
+//////////////////////////////////////////////////////////////////////////
+
 __global__ void evolve3DShape_device(float* tmpsdfptr, float* sdfptr, float* pinptr, Vector3i voldim)
 {
 	int i = blockIdx.x * 8 + threadIdx.x;
